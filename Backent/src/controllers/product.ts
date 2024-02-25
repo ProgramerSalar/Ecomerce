@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { rm } from "fs";
 import { Product } from "../models/product.js";
-import { newProductProps } from "../types/type.js";
+import { SearchProps, baseQuery, newProductProps } from "../types/type.js";
 
 export const newProduct = async (
   req: Request<{}, {}, newProductProps>,
@@ -166,3 +166,57 @@ export const deletedProduct = async (
     message: "SuccessfUlly deleted Product",
   });
 };
+
+export const getAllProduct = async (
+  req: Request<{}, {}, {}, SearchProps>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { search, category, price, sort } = req.query;
+  // console.log(search)
+  const page = 1;
+  const skip = (page - 1) * 8;
+  const limit = 8;
+  const BaseQuery: baseQuery = {};
+
+  // search property
+  if (search) {
+    BaseQuery.name = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+
+  // this is filter property
+  if (price) {
+    BaseQuery.price = {
+      $lte: price,
+    };
+  }
+  if (category) {
+    BaseQuery.category = category;
+  }
+
+  const Promiseproducts = await Product.find(BaseQuery)
+    .limit(limit)
+    .skip(skip)
+    .sort(sort && { price: sort === "asc" ? 1 : -1 });
+
+  const filterProduct = await Product.find(BaseQuery);
+
+  const [products, filterProducts] = await Promise.all([
+    Promiseproducts,
+    filterProduct,
+  ]);
+
+  const totalPage = Math.ceil(filterProducts.length / limit);
+  // const totalPage = filterProducts.length / limit
+
+  res.status(200).json({
+    success: true,
+    products,
+    totalPage,
+  });
+};
+
+

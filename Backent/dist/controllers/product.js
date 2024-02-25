@@ -121,3 +121,43 @@ export const deletedProduct = async (req, res, next) => {
         message: "SuccessfUlly deleted Product",
     });
 };
+export const getAllProduct = async (req, res, next) => {
+    const { search, category, price, sort } = req.query;
+    // console.log(search)
+    const page = 1;
+    const skip = (page - 1) * 8;
+    const limit = 8;
+    const BaseQuery = {};
+    // search property
+    if (search) {
+        BaseQuery.name = {
+            $regex: search,
+            $options: "i",
+        };
+    }
+    // this is filter property
+    if (price) {
+        BaseQuery.price = {
+            $lte: price,
+        };
+    }
+    if (category) {
+        BaseQuery.category = category;
+    }
+    const Promiseproducts = await Product.find(BaseQuery)
+        .limit(limit)
+        .skip(skip)
+        .sort(sort && { price: sort === "asc" ? 1 : -1 });
+    const filterProduct = await Product.find(BaseQuery);
+    const [products, filterProducts] = await Promise.all([
+        Promiseproducts,
+        filterProduct,
+    ]);
+    const totalPage = Math.ceil(filterProducts.length / limit);
+    // const totalPage = filterProducts.length / limit
+    res.status(200).json({
+        success: true,
+        products,
+        totalPage,
+    });
+};

@@ -5,6 +5,7 @@ import {
   deletedProduct,
   getAdminProduct,
   getAllCategories,
+  getAllProduct,
   getLatestProduct,
   getUserProduct,
   newProduct,
@@ -21,6 +22,8 @@ router
   .get(getUserProduct)
   .put(upload, PutUserProduct)
   .delete(deletedProduct);
+
+router.get("/getAllProduct", getAllProduct)
 
 export default router;
 
