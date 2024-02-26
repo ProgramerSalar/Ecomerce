@@ -6,7 +6,6 @@ const schema = new mongoose.Schema({
     },
     photo: {
         type: String,
-        required: [true, "Please ENter Photo"]
     },
     price: {
         type: Number,

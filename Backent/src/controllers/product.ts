@@ -3,6 +3,7 @@ import { rm } from "fs";
 import { Product } from "../models/product.js";
 import { SearchProps, baseQuery, newProductProps } from "../types/type.js";
 
+
 export const newProduct = async (
   req: Request<{}, {}, newProductProps>,
   res: Response,
@@ -218,5 +219,3 @@ export const getAllProduct = async (
     totalPage,
   });
 };
-
-

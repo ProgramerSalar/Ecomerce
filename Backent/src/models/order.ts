@@ -1,0 +1,73 @@
+import mongoose from "mongoose";
+
+
+const schema = new mongoose.Schema({
+    
+    shippingInfo:{
+        address:{
+            type:String,
+            required:true
+        },
+        city:{
+            type:String,
+            required:true
+        },
+        state:{
+            type:String,
+            required:true
+        },
+        country:{
+            type:String,
+            required:true
+        },
+        pinCode:{
+            type:Number,
+            required:true
+        }
+    },
+    user:{
+        type:String,
+        ref:"User",
+        required:false
+    },
+    subtotal:{
+        type:Number,
+        required:true
+    },
+    tax:{
+        type:Number,
+        required:true
+    },
+    shippingCharges:{
+        type:Number,
+        required:true
+    },
+    discount:{
+        type:Number
+    },
+    total:{
+        type:Number,
+        required:true
+    },
+    status:{
+        type:String,
+        enum:["Processing", "Shipped", "Deliverd"],
+        default:"Processing"
+    },
+    orderItems:[{
+        name:String,
+        photo:String,
+        price:String,
+        quantity:Number,
+        productId:{
+            type:mongoose.Types.ObjectId,
+            required:true,
+            ref:"Product"
+        }
+    }]
+},{
+    timestamps:true
+})
+
+
+export const Order = mongoose.model("Order", schema)
