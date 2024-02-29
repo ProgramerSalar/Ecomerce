@@ -62,5 +62,6 @@ export interface NewUserProps{
   gender:string;
   dob:Date;
   photo:string;
+  createdAt:Date;
   
 }

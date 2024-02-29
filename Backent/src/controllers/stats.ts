@@ -407,7 +407,177 @@ export const getBarCharts = async (
   res: Response,
   next: NextFunction
 ) => {
+  const today = new Date();
+  const lastsixMonth = new Date(today.getFullYear(), today.getMonth() - 6);
+  // console.log(lastsixMonth)
+  const lastTwelveMonth = new Date(today.getFullYear(), today.getMonth() - 12);
+  // console.log(lastTwelveMonth)
 
+  const sixMonthProductPromise = await Product.find({
+    createdAt: {
+      $gt: lastsixMonth,
+      $lte: today,
+    },
+  });
+  // console.log(sixMonthProductPromise)
 
-  console.log("hello world")
+  const sixMonthUserPromise = await User.find({
+    createdAt: {
+      $gt: lastsixMonth,
+      $lte: today,
+    },
+  });
+  // console.log(sixMonthUserPromise)
+
+  const tweleveMonthOrderPromise = await Order.find({
+    createdAt: {
+      $gt: lastTwelveMonth,
+      $lte: today,
+    },
+  });
+  // console.log(tweleveMonthOrderPromise)
+
+  const [product, user, order] = await Promise.all([
+    sixMonthProductPromise,
+    sixMonthUserPromise,
+    tweleveMonthOrderPromise,
+  ]);
+
+  const ProductArray = new Array(6).fill(0);
+  const UserArray = new Array(6).fill(0);
+  const OrderArray = new Array(12).fill(0);
+
+  product.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 6) {
+      ProductArray[6 - monthDiff - 1] += 1;
+    }
+  });
+
+  user.forEach((i) => {
+    const createDate = i.createdAt;
+    const monthDiff = today.getMonth() - createDate.getMonth();
+
+    if (monthDiff < 6) {
+      UserArray[6 - monthDiff - 1] += 1;
+    }
+  });
+
+  // console.log(UserArray)
+
+  order.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 6) {
+      OrderArray[12 - monthDiff - 1] += 1;
+    }
+  });
+  // console.log(OrderArray)
+
+  const stats = {
+    product: ProductArray,
+    user: UserArray,
+    order: OrderArray,
+  };
+
+  res.status(200).json({
+    success: true,
+    stats,
+  });
+};
+
+export const getLineChart = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // console.log('hello world')
+  const today = new Date();
+  const TwelelveMonth = new Date(today.getFullYear(), today.getMonth() - 12);
+  // console.log(TwelelveMonth)
+
+  const twelveMonthUser = await User.find({
+    createdAt: {
+      $gt: TwelelveMonth,
+      $lte: today,
+    },
+  });
+  // console.log(twelveMonthUser)
+
+  const tweleveMonthProduct = await Product.find({
+    createdAt: {
+      $gt: TwelelveMonth,
+      $lte: today,
+    },
+  });
+  // console.log(tweleveMonthProduct)
+
+  const twelveMonthOrder = await Order.find({
+    createdAt: {
+      $gt: TwelelveMonth,
+      $lte: today,
+    },
+  });
+  // console.log(twelveMonthRevenue)
+
+  const UserArray = new Array(12).fill(0);
+  const ProductArray = new Array(12).fill(0);
+  const TotalArray = new Array(12).fill(0);
+  const TotalDiscount = new Array(12).fill(0);
+
+  twelveMonthUser.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 12) {
+      UserArray[12 - monthDiff - 1] += 1;
+    }
+  });
+  // console.log(UserArray)
+
+  tweleveMonthProduct.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 12) {
+      ProductArray[12 - monthDiff - 1] += 1;
+    }
+  });
+
+  // console.log(ProductArray)
+
+  twelveMonthOrder.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 12) {
+      TotalArray[12 - monthDiff - 1] += i.total;
+    }
+  });
+  // console.log(TotalArray)
+
+  twelveMonthOrder.forEach((i) => {
+    const createdDate = i.createdAt;
+    const monthDiff = today.getMonth() - createdDate.getMonth();
+
+    if (monthDiff < 12) {
+      TotalDiscount[12 - monthDiff - 1] += i.discount;
+    }
+  });
+  // console.log(TotalDiscount)
+
+  const stats = {
+    users: UserArray,
+    product: ProductArray,
+    revenue: TotalArray,
+    discount: TotalDiscount,
+  };
+
+  res.status(200).json({
+    success: true,
+    stats,
+  });
 };
