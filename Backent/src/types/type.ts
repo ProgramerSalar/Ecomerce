@@ -55,3 +55,12 @@ export interface NewOrderRequestProps{
   orderItems:orderItemsRequestProps[]
 
 }
+
+export interface NewUserProps{
+  name:string;
+  email:string;
+  gender:string;
+  dob:Date;
+  photo:string;
+  
+}
